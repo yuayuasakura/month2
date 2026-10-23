@@ -24,5 +24,8 @@ class DatabaseSeeder extends Seeder
 
         // 投稿のカテゴリーを登録
         $this->call(CategorySeeder::class);
+
+        // 予約システムのサンプルイベントを登録
+        $this->call(EventSeeder::class);
     }
 }
