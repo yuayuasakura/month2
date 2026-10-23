@@ -31,7 +31,7 @@ services:
       - "${DB_HOST_PORT:-3306}:3306"
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - db-data:/var/lib/mysql   # MySQLのデータを「db-data」というボリュームに永続化
     networks:
@@ -41,11 +41,11 @@ services:
   phpmyadmin:
     image: phpmyadmin:latest
     ports:
-      - "${DB_PORT:-8080}:80"
+      - "${PMA_PORT:-8080}:80"
     environment:
       PMA_HOST: db
       PMA_USER: root
-      PMA_PASSWORD: secret
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     depends_on:
       - db
     networks:

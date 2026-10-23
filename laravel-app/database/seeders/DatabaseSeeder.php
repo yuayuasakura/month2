@@ -21,5 +21,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // 投稿のカテゴリーを登録
+        $this->call(CategorySeeder::class);
     }
 }
