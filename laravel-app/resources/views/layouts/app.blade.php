@@ -20,6 +20,11 @@
         .error { color: #dc2626; font-size: 0.9em; margin: 4px 0 0; }
         .actions { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
         .btn-danger { background: #dc2626; color: #fff; border: none; padding: 6px 12px; cursor: pointer; }
+        .table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        .table th, .table td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
+        .table .num { text-align: right; }
+        .table tr.cancelled td { color: #999; }
+        .btn { display: inline-block; padding: 8px 16px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 4px; }
         .pagination { display: flex; gap: 8px; list-style: none; padding: 0; }
     </style>
 </head>
@@ -29,6 +34,9 @@
             <a href="/">ホーム</a>
             <a href="{{ route('posts.index') }}">投稿一覧</a>
             <a href="{{ route('posts.create') }}">新規投稿</a>
+            <a href="{{ route('products.index') }}">商品一覧</a>
+            <a href="{{ route('events.index') }}">イベント</a>
+            <a href="{{ route('reservations.index') }}">予約一覧</a>
         </nav>
     </header>
 
@@ -36,6 +44,12 @@
         @if (session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-error">
+                {{ session('error') }}
             </div>
         @endif
 
