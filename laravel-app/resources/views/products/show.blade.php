@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.blog')
 
 @section('title', $product->name)
 
@@ -34,7 +34,7 @@
         <a href="{{ route('products.edit', $product) }}">編集</a>
 
         <form action="{{ route('products.destroy', $product) }}" method="POST"
-              onsubmit="return confirm('本当に削除しますか？');">
+              data-confirm="本当に削除しますか？">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn-danger">削除</button>

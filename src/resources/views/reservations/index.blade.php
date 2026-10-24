@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.blog')
 
 @section('title', '予約一覧')
 
@@ -32,7 +32,7 @@
                                 キャンセル済み
                             @elseif ($reservation->isCancellable())
                                 <form action="{{ route('reservations.cancel', $reservation) }}" method="POST"
-                                      onsubmit="return confirm('この予約をキャンセルしますか？');">
+                                      data-confirm="この予約をキャンセルしますか？">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="btn-danger">キャンセル</button>
