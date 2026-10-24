@@ -1,63 +1,36 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') - My App</title>
-    <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 0 16px; color: #222; }
-        header nav { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid #ddd; }
-        main { padding: 24px 0; }
-        footer { padding: 16px 0; border-top: 1px solid #ddd; color: #777; font-size: 0.9em; }
-        a { color: #2563eb; }
-        article { padding: 12px 0; border-bottom: 1px solid #eee; }
-        .alert-success { padding: 12px; margin-bottom: 16px; background: #dcfce7; border: 1px solid #86efac; }
-        .alert-error { padding: 12px; margin-bottom: 16px; background: #fee2e2; border: 1px solid #fca5a5; }
-        .category { display: inline-block; padding: 2px 8px; font-size: 0.8em; background: #e0e7ff; border-radius: 4px; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 4px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; box-sizing: border-box; }
-        .error { color: #dc2626; font-size: 0.9em; margin: 4px 0 0; }
-        .actions { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
-        .btn-danger { background: #dc2626; color: #fff; border: none; padding: 6px 12px; cursor: pointer; }
-        .table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-        .table th, .table td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
-        .table .num { text-align: right; }
-        .table tr.cancelled td { color: #999; }
-        .btn { display: inline-block; padding: 8px 16px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 4px; }
-        .pagination { display: flex; gap: 8px; list-style: none; padding: 0; }
-    </style>
-</head>
-<body>
-    <header>
-        <nav>
-            <a href="/">ホーム</a>
-            <a href="{{ route('posts.index') }}">投稿一覧</a>
-            <a href="{{ route('posts.create') }}">新規投稿</a>
-            <a href="{{ route('products.index') }}">商品一覧</a>
-            <a href="{{ route('events.index') }}">イベント</a>
-            <a href="{{ route('reservations.index') }}">予約一覧</a>
-        </nav>
-    </header>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <main>
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+        <title>{{ config('app.name', 'Laravel') }}</title>
 
-        @if (session('error'))
-            <div class="alert alert-error">
-                {{ session('error') }}
-            </div>
-        @endif
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        @yield('content')
-    </main>
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased">
+        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+            @include('layouts.navigation')
 
-    <footer>
-        © 2025 My App
-    </footer>
-</body>
+            <!-- Page Heading -->
+            @isset($header)
+                <header class="bg-white dark:bg-gray-800 shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endisset
+
+            <!-- Page Content -->
+            <main>
+                {{ $slot }}
+            </main>
+        </div>
+    </body>
 </html>

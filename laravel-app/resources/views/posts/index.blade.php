@@ -1,11 +1,17 @@
-@extends('layouts.app')
+@extends('layouts.blog')
 
 @section('title', '投稿一覧')
 
 @section('content')
     <h1>投稿一覧</h1>
 
-    <a href="{{ route('posts.create') }}">新規投稿</a>
+    {{-- @auth：ログインしているときだけ表示 / @guest：ログインしていないときだけ表示 --}}
+    @auth
+        <a href="{{ route('posts.create') }}">新規投稿</a>
+    @endauth
+    @guest
+        <p>投稿するには<a href="{{ route('login') }}">ログイン</a>してください。</p>
+    @endguest
 
     @forelse ($posts as $post)
         <article>
@@ -16,7 +22,10 @@
                 </a>
             </h2>
             <p>{{ Str::limit($post->content, 100) }}</p>
-            <small>{{ $post->created_at->format('Y年m月d日') }}</small>
+            <small>
+                {{ $post->user->name ?? '投稿者不明' }} ／ {{ $post->created_at->format('Y年m月d日') }}
+                ／ コメント {{ $post->comments_count }}件
+            </small>
         </article>
     @empty
         <p>投稿がありません</p>

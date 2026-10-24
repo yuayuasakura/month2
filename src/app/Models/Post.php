@@ -24,8 +24,14 @@ class Post extends Model
         return $this->belongsTo(Category::class);
     }
 
+    // hasMany: 投稿(1) → コメント(多)
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     // belongsTo: 投稿(多) → ユーザー(1)
-    // ※ posts.user_id カラムは Week 8 で追加予定
+    // user_id は $fillable に入れない（フォームから偽装されないよう、コントローラーで $request->user()->posts() 経由で設定する）
     public function user()
     {
         return $this->belongsTo(User::class);
