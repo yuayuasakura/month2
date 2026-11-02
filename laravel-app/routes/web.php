@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\TaskController;
 
 // 基本的なルート（GETリクエストで / にアクセスしたら welcome ビューを返す）
 Route::get('/', function () {
@@ -45,6 +46,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// ===== タスク管理 =====
+// タスクは個人のものなので、一覧・詳細も含めて全てログインユーザーのみ
+Route::middleware('auth')->group(function () {
+    Route::resource('tasks', TaskController::class);
 });
 
 // ===== 商品管理（CRUD全て） =====

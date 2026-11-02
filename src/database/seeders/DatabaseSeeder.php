@@ -27,5 +27,8 @@ class DatabaseSeeder extends Seeder
 
         // 予約システムのサンプルイベントを登録
         $this->call(EventSeeder::class);
+
+        // タスクのラベルを登録
+        $this->call(LabelSeeder::class);
     }
 }

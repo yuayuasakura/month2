@@ -36,6 +36,15 @@
         .comment-form { margin-top: 16px; }
         .link-button.danger { color: #dc2626; }
         .pagination { display: flex; gap: 8px; list-style: none; padding: 0; }
+        .priority { display: inline-block; padding: 2px 8px; font-size: 0.8em; font-weight: bold; border-radius: 4px; }
+        .priority-high { background: #fee2e2; color: #b91c1c; }
+        .priority-medium { background: #fef9c3; color: #a16207; }
+        .priority-low { background: #e5e7eb; color: #4b5563; }
+        .overdue { color: #dc2626; font-weight: bold; }
+        .label-title { display: block; font-weight: bold; margin-bottom: 4px; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 16px; }
+        .checkbox-group label { font-weight: normal; }
+        .form-group .checkbox-group input { width: auto; }
     </style>
 </head>
 <body>
@@ -49,6 +58,9 @@
             <a href="{{ route('products.index') }}">商品一覧</a>
             <a href="{{ route('events.index') }}">イベント</a>
             <a href="{{ route('reservations.index') }}">予約一覧</a>
+            @auth
+                <a href="{{ route('tasks.index') }}">タスク</a>
+            @endauth
 
             <span class="nav-right">
                 @auth
