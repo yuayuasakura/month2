@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('posts.index')" :active="request()->routeIs('posts.*')">
                         ブログ
                     </x-nav-link>
+                    <x-nav-link :href="route('tasks.index')" :active="request()->routeIs('tasks.*')">
+                        タスク
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -74,6 +77,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('posts.index')" :active="request()->routeIs('posts.*')">
                 ブログ
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('tasks.index')" :active="request()->routeIs('tasks.*')">
+                タスク
             </x-responsive-nav-link>
         </div>
 

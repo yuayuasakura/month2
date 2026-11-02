@@ -58,4 +58,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comment::class);
     }
+
+    // hasMany: ユーザー(1) → タスク(多)
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
 }

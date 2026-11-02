@@ -3,36 +3,39 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CommentRequest;
-use App\Models\Comment;
-use App\Models\Post;
+use App\Repositories\CommentRepository;
+use App\Services\CommentService;
 use Illuminate\Support\Facades\Gate;
 
 class CommentController extends Controller
 {
+    public function __construct(
+        private CommentService $commentService,
+        private CommentRepository $commentRepository
+    ) {}
+
     // コメントの保存（ログインユーザーのみ：routes/web.php の auth ミドルウェアで制限）
-    public function store(CommentRequest $request, Post $post)
+    // ルートが posts.comments（shallow）なので、URLの {post} が $postId に入る
+    public function store(CommentRequest $request, int $postId)
     {
-        // 投稿に紐づくコメントを作り（post_id がセットされる）、投稿者としてログインユーザーを設定する
-        $comment = $post->comments()->make($request->validated());
-        $comment->user()->associate($request->user());
-        $comment->save();
+        $this->commentService->createComment($postId, $request->validated(), $request->user()->id);
 
         return redirect()
-            ->to(route('posts.show', $post) . '#comments')
+            ->to(route('posts.show', $postId) . '#comments')
             ->with('success', 'コメントを投稿しました');
     }
 
     // コメントの削除
-    public function destroy(Comment $comment)
+    public function destroy(int $id)
     {
+        $comment = $this->commentRepository->findById($id);
         // CommentPolicy の delete() で判定。自分のコメントでなければ 403 エラー
         Gate::authorize('delete', $comment);
 
-        $post = $comment->post;
-        $comment->delete();
+        $this->commentService->deleteComment($comment);
 
         return redirect()
-            ->to(route('posts.show', $post) . '#comments')
+            ->to(route('posts.show', $comment->post_id) . '#comments')
             ->with('success', 'コメントを削除しました');
     }
 }

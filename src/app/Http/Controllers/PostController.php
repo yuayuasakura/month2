@@ -3,65 +3,75 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
-use App\Models\Category;
-use App\Models\Post;
+use App\Repositories\CategoryRepository;
+use App\Repositories\PostRepository;
+use App\Services\PostService;
 use Illuminate\Support\Facades\Gate;
 
+// コントローラーの役割は「リクエストを受け取る → 権限チェック → Service/Repository に渡す → レスポンスを返す」だけ
+//   バリデーション：PostRequest
+//   権限チェック：PostPolicy（Gate::authorize）
+//   データの取得：PostRepository / CategoryRepository
+//   データの保存・更新・削除：PostService
 class PostController extends Controller
 {
+    public function __construct(
+        private PostService $postService,
+        private PostRepository $postRepository,
+        private CategoryRepository $categoryRepository
+    ) {}
+
     // 一覧表示（誰でも見られる）
     public function index()
     {
-        // with() で投稿者・カテゴリーをまとめて取得（N+1問題を防ぐ）
-        // withCount('comments') で各投稿のコメント数（comments_count）も取得する
-        $posts = Post::with(['user', 'category'])->withCount('comments')->latest()->paginate(10);
+        $posts = $this->postRepository->getPublished();
         return view('posts.index', compact('posts'));
     }
 
     // 作成フォーム表示（ログインユーザーのみ：routes/web.php の auth ミドルウェアで制限）
     public function create()
     {
-        $categories = Category::orderBy('id')->get();
+        $categories = $this->categoryRepository->getAll();
         return view('posts.create', compact('categories'));
     }
 
     // データ保存（バリデーションは PostRequest で行う）
     public function store(PostRequest $request)
     {
-        // ログイン中のユーザーの投稿として作成する（user_id が自動でセットされる）
-        $post = $request->user()->posts()->create($request->validated());
+        // コントローラーは「受け取って渡す」だけ。処理の詳細はServiceに任せる
+        $post = $this->postService->createPost($request->validated(), $request->user()->id);
 
         return redirect()
             ->route('posts.show', $post)
             ->with('success', '投稿を作成しました');
     }
 
-    // 詳細表示（ルートモデルバインディング：{post} のIDから自動で取得、なければ404）
-    public function show(Post $post)
+    // 詳細表示（誰でも見られる。なければ404）
+    public function show(int $id)
     {
-        // コメントを古い順に、コメントした人と一緒に取得する（ログインしていなくても見られる）
-        $post->load(['user', 'category', 'comments' => fn ($query) => $query->with('user')->oldest()]);
-
+        $post = $this->postRepository->findWithComments($id);
         return view('posts.show', compact('post'));
     }
 
     // 編集フォーム表示
-    public function edit(Post $post)
+    public function edit(int $id)
     {
+        $post = $this->postRepository->findById($id);
         // PostPolicy の update() で判定。自分の投稿でなければ 403 エラー
         Gate::authorize('update', $post);
 
-        $categories = Category::orderBy('id')->get();
+        $categories = $this->categoryRepository->getAll();
         return view('posts.edit', compact('post', 'categories'));
     }
 
     // データ更新
-    public function update(PostRequest $request, Post $post)
+    public function update(PostRequest $request, int $id)
     {
+        $post = $this->postRepository->findById($id);
         // フォームを経由せず直接リクエストを送られても防げるよう、更新処理でもチェックする
         Gate::authorize('update', $post);
 
-        $post->update($request->validated());
+        $post = $this->postService->updatePost($post, $request->validated());
 
         return redirect()
             ->route('posts.show', $post)
@@ -69,11 +79,12 @@ class PostController extends Controller
     }
 
     // データ削除
-    public function destroy(Post $post)
+    public function destroy(int $id)
     {
+        $post = $this->postRepository->findById($id);
         Gate::authorize('delete', $post);
 
-        $post->delete();
+        $this->postService->deletePost($post);
 
         return redirect()
             ->route('posts.index')
