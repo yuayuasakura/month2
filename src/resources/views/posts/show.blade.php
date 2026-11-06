@@ -2,9 +2,7 @@
 
 @section('title', $post->title)
 
-@if ($post->image_path)
-    <img src="{{ Storage::disk('s3')->url($post->image_path) }}" alt="{{ $post->title }}" style="max-width: 100%;">
-@endif
+
 
 @section('content')
     <span class="category">{{ $post->category->name }}</span>
@@ -16,9 +14,14 @@
             ／ 更新日: {{ $post->updated_at->format('Y年m月d日 H:i') }}
         @endif
     </small>
+    
 
     {{-- nl2br で改行を <br> に変換（e() でエスケープしてから変換するのでXSS対策になる） --}}
     <p>{!! nl2br(e($post->content)) !!}</p>
+
+    @if ($post->image_path)
+        <img src="{{ Storage::disk('s3')->url($post->image_path) }}" alt="{{ $post->title }}" style="max-width: 100%;">
+    @endif
 
     <div class="actions">
         {{-- @can：PostPolicy の判定が true のとき（＝自分の投稿のとき）だけボタンを表示 --}}

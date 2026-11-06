@@ -56,7 +56,7 @@ class SecurityHeaders
             "script-src 'self' 'nonce-{$nonce}' 'unsafe-eval'{$viteDev}",
             "style-src 'self' 'unsafe-inline' https://fonts.bunny.net{$viteDev}",
             "font-src 'self' https://fonts.bunny.net",
-            "img-src 'self' data:",
+            "img-src 'self' data: https://yuayuasakura0330.s3.ap-southeast-2.amazonaws.com",
             "connect-src 'self'{$viteDev}",
             "object-src 'none'",
             "base-uri 'self'",
