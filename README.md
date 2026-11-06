@@ -116,6 +116,20 @@ docker compose exec app php artisan serve
 ・ブラウザで http://localhost:8000 を開くと動作を確認できる。
 
 
+## 動かし方
+・Laravelを起動する
+docker compose up -d
+
+(・初回のみテーブルとテスト用ユーザーを作成)
+docker compose exec app php artisan migrate
+docker compose exec app php artisan db:seed
+
+・フロントエンドを起動する
+cd my-frontend
+npm install
+npm run dev
+
+
 
 # week10練習課題2
 ## なぜこの単位で分けたのか
