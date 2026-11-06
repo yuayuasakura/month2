@@ -11,6 +11,7 @@ class Post extends Model
         'title',
         'content',
         'category_id',
+        'image_path',
     ];
 
     // created_at をCarbonオブジェクトに変換（->format()が使えるようになる）
