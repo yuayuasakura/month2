@@ -17,9 +17,11 @@
     <p v-if="message" class="error">{{ message }}</p>
 
     <!-- 送信中はボタンを押せないようにする（二重投稿の防止） -->
-    <button type="submit" :disabled="submitting">
-      {{ submitting ? '送信中...' : '投稿する' }}
-    </button>
+    <div class="actions">
+      <button type="submit" class="submit-button" :disabled="submitting">
+        {{ submitting ? '送信中...' : '投稿する' }}
+      </button>
+    </div>
   </form>
 </template>
 
@@ -85,5 +87,28 @@ async function createPost() {
 .error {
   color: #dc2626;
   margin: 4px 0 0;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.submit-button {
+  padding: 10px 28px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background: hsla(160, 100%, 37%, 1);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.submit-button:hover {
+  background: hsla(160, 100%, 30%, 1);
+}
+/* 送信中は押せないことが分かるように薄くする */
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

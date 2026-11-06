@@ -2,6 +2,10 @@
 
 @section('title', $post->title)
 
+@if ($post->image_path)
+    <img src="{{ Storage::disk('s3')->url($post->image_path) }}" alt="{{ $post->title }}" style="max-width: 100%;">
+@endif
+
 @section('content')
     <span class="category">{{ $post->category->name }}</span>
     <h1>{{ $post->title }}</h1>
