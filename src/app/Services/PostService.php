@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Post;
+use App\Repositories\CategoryRepository;
 use App\Repositories\PostRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -17,8 +19,14 @@ class PostService
     //       $this->postRepository = $postRepository;
     //   }
     public function __construct(
-        private PostRepository $postRepository
+        private PostRepository $postRepository,
+        private UserRepository $userRepository,
+        private CategoryRepository $categoryRepository
     ) {}
+
+    // API の投稿者・カテゴリー（今週の API は認証なしなので固定）
+    private const API_USER_EMAIL = 'test@example.com';
+    private const API_CATEGORY_NAME = 'その他';
 
     public function createPost(array $data, int $userId)
     {
@@ -37,6 +45,18 @@ class PostService
 
             return $post;
         });
+    }
+
+    // API（Vue.js のフォーム）からの投稿作成
+    // Seeder で作ったテスト用ユーザーの投稿として、「その他」カテゴリーで保存する
+    public function createApiPost(array $data)
+    {
+        $user = $this->userRepository->findByEmail(self::API_USER_EMAIL);
+        $data['category_id'] = $this->categoryRepository->firstOrCreateByName(self::API_CATEGORY_NAME)->id;
+
+        // 保存処理そのものは画面からの投稿と同じ createPost() を使う
+        // レスポンスで投稿者名を返すので、user も読み込んでおく
+        return $this->createPost($data, $user->id)->load('user');
     }
 
     // 権限チェック（Gate）はコントローラーで済ませてから呼ぶので、取得済みの Post を受け取る

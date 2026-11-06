@@ -36,9 +36,11 @@ class PostRepository
     {
         // with() で投稿者・カテゴリーをまとめて取得（N+1問題を防ぐ）
         // withCount('comments') で各投稿のコメント数（comments_count）も取得する
+        // 同じ秒に作られた投稿の順番がぶれないよう、IDの大きい順を2つ目の並び順にする
         return Post::with(['user', 'category'])
             ->withCount('comments')
             ->latest()
+            ->latest('id')
             ->paginate(10);
     }
 
