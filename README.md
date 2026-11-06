@@ -116,6 +116,7 @@ docker compose exec app php artisan serve
 ・ブラウザで http://localhost:8000 を開くと動作を確認できる。
 
 
+# week10
 ## 動かし方
 ・Laravelを起動する
 docker compose up -d
@@ -136,3 +137,95 @@ npm run dev
 一つのコンポーネントは一つの役割を持つという基準で分けました。
 もしPostListの中でPostCardの見た目まで書いていたら、詳細のページを作る際に同じコードをまた書き直すことになります。
 そのため、表示の部品であるPostCardを独立させてどのページからでも同じ見た目で使えるようにしました。
+
+# week11
+## デプロイ手順
+### ・AWSアカウントと予算アラート
+無料プランでAWSアカウントを作成する。
+AWS Budgetsで予算を作成し、設定した金額を超えそうになったらメールで通知されるようにする。
+
+### ・EC2インスタンスの作成とSSH接続
+EC2でインスタンスを起動し、作成する。
+秘密鍵のパーミッションを制限して接続する
+chmod 400 ~/Downloads/my-ec2-key.pem
+ssh -i ~/Downloads/my-ec2-key.pem ubuntu@<Elastic IPのアドレス>
+
+### ・Elastic IPの割り当て
+EC2のElastic IPで新しいアドレスを割り当てる
+アクション→Elastic IPアドレスの関連付けで作成したインスタンスに関連付ける
+関連付けると EC2 の IP アドレスが変わるため、SSH は新しいアドレスで接続し直す。
+
+### ・RDSの作成
+RDSでMySQLのデータベースを無料利用枠テンプレートで作成する
+
+### ・EC2上でアプリを起動する
+EC2にDockerとDocker Composeをインストールする
+リポジトリをクローンし、環境変数ファイルを作成する
+
+```bash
+git clone https://github.com/yuayuasakura/month2.git
+cd month2
+cp .env.example .env
+cp src/.env.example src/.env 
+```
+
+EC2上の'src/.env'にRDSの接続情報を設定する
+
+```
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=http://<Elastic IPのアドレス>
+
+DB_HOST=<RDSのエンドポイント>
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=<RDSのマスターユーザー名>
+DB_PASSWORD=<RDSのパスワード>
+```
+
+`docker-compose.yml` から `db` と `phpmyadmin` のサービス、`app` の `depends_on` を削除する
+コンテナを起動し、Laravel の初期設定をする
+```bash
+docker compose up -d --build
+docker compose exec app composer install --no-dev --optimize-autoloader
+docker compose exec app php artisan key:generate
+docker compose exec app chown -R www-data:www-data storage bootstrap/cache
+```
+
+マイグレーションと初期データの投入
+
+```bash
+docker compose exec app php artisan migrate --force
+docker compose exec app php artisan db:seed --force
+```
+
+Node.js をインストールし、Breeze の画面用ファイルをビルドする
+
+```bash
+cd src
+npm install
+npm run build
+```
+
+### ・セキュリティグループの設定
+SSH:22 は自分のIPのみ・HTTP:80 は全許可とする。
+
+### ・動作確認
+ブラウザで次の URL を開き、表示されることを確認する。
+`http://<Elastic IPのアドレス>/login`
+`http://<Elastic IPのアドレス>/posts`
+
+
+## セキュリティグループの設計説明
+方向・タイプ・ポート・範囲・理由
+以上の順番で記述する
+### launch-wizard-1
+インバウンド・SSH・22・自分のIP(/32)・サーバーを操作できるのは管理者である自分だけで良いため。誰でもアクセスできるようにしてしまうと攻撃を受けてしまう可能性があるため。
+インバウンド・HTTP・80・0.0.0.0/0・ブログは誰でも閲覧できるサービスなので全員がアクセスできるようにしている。
+アウトバウンド・全て・全て・0.0.0.0/0・パッケージのインストールやS3への画像アップロードなど、EC2から外部へ接続する必要がある。
+
+### rds-ec2-2
+インバウンド・MYSQL/Aurora・3306・rds-ec2-2のグループのみ・データベースに接続するのはlaravelが動くEC2のみで良いため。
+
+### ec2-rds-2
+アウトバウンド・MYSQL/Aurora・3306・rds-ec2-2のグループのみ・EC2からRDSへの通信だけを許可するため。
