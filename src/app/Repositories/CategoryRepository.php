@@ -11,4 +11,10 @@ class CategoryRepository
     {
         return Category::orderBy('id')->get();
     }
+
+    // 名前で取得（なければ作る）
+    public function firstOrCreateByName(string $name)
+    {
+        return Category::firstOrCreate(['name' => $name]);
+    }
 }

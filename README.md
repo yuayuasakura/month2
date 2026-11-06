@@ -36,38 +36,39 @@ docker compose exec app php artisan migrate
 
 ### ブログ投稿
 id・int・なし
-title・char・必須(255文字以内)
-body・char・必須
-category・char・必須
+title・char・必須(200文字以内)
+content・char・必須
+category_id・char・必須
 created_at・timestamp・自動
 updated_at・timestamp・自動
 
 ### 商品管理
 id・int・なし
-name・int・必須
+name・int・100文字以内
 price・int・0以上の整数
 description・char・任意
 stock・int・0以上の整数
-category・char・必須
+category・char・50文字以内
 created_at/updated_at・timestamp・自動
 
 ### イベント
 id・int・なし
-title・char・必須
+title・char・100文字以内
 description・char・任意
-venue・char・なし
-start_at・datetime・なし
+venue・char・100文字以内
+start_date・datetime・なし
+end_date・date_time・なし
 capacity・int・なし
 created_at/updated_at・timestamp・自動
 
 ### イベント予約
 id・int・なし
 event_id・int・なし
-name・char・必須
-email・char・メール形式である
-number_of_people・int・1以上
-reserved・datetime・フォームで入力する
-canceled・datetime・nullなら有効
+name・char・50文字以内
+email・char・メール形式である。255文字以内
+people・int・1以上
+reserved_at・datetime・フォームで入力する
+canceled_at・datetime・nullなら有効
 created_at/updated_at・timestamp・自動
 
 ## スクリーンショット
@@ -88,10 +89,13 @@ created_at/updated_at・timestamp・自動
 git clone https://github.com/yuayuasakura/month2.git
 cd month2
 ・phpのパッケージをインストール
-composer install
+docker compose up -d
+docker compose exec app composer install
+
 ・環境設定ファイルを作成
 cp .env.example .env
-php artisan key:generate
+docker compose exec app php artisan key:generate
+
 ・'.env'のデータベース設定を自分の環境に合わせて編集して、データベースを作成する
 '''env
 DB_DATABASE=techmeets_blog
@@ -100,13 +104,21 @@ DB_PASSWORD=
 '''
 
 ・テーブルを作成する
-php artisan migrate --seed
+docker compose exec app php artisan migrate --seed
 
 ・フロントエンドのビルド
 npm install
 npm run build
 
 ・サーバーを起動する
-php artisan serve
+docker compose exec app php artisan serve
 
 ・ブラウザで http://localhost:8000 を開くと動作を確認できる。
+
+
+
+# week10練習課題2
+## なぜこの単位で分けたのか
+一つのコンポーネントは一つの役割を持つという基準で分けました。
+もしPostListの中でPostCardの見た目まで書いていたら、詳細のページを作る際に同じコードをまた書き直すことになります。
+そのため、表示の部品であるPostCardを独立させてどのページからでも同じ見た目で使えるようにしました。
