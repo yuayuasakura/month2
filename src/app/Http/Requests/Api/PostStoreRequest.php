@@ -19,6 +19,8 @@ class PostStoreRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:200'],
             'content' => ['required', 'string', 'max:10000'],
+            // 画像は任意（画面からの投稿と同じく 2MB まで）
+            'image' => ['nullable', 'image', 'max:2048'],
         ];
     }
 
@@ -30,6 +32,8 @@ class PostStoreRequest extends FormRequest
             'title.max' => 'タイトルは200文字以内で入力してください',
             'content.required' => '本文を入力してください',
             'content.max' => '本文は10000文字以内で入力してください',
+            'image.image' => '画像ファイルを選択してください',
+            'image.max' => '画像は2MB以内にしてください',
         ];
     }
 }

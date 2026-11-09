@@ -7,7 +7,6 @@ use App\Repositories\CategoryRepository;
 use App\Repositories\PostRepository;
 use App\Services\PostService;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 
 // コントローラーの役割は「リクエストを受け取る → 権限チェック → Service/Repository に渡す → レスポンスを返す」だけ
 //   バリデーション：PostRequest
@@ -39,15 +38,8 @@ class PostController extends Controller
     // データ保存（バリデーションは PostRequest で行う）
     public function store(PostRequest $request)
     {
-        $data = $request->validated();
-
-        if ($request->hasFile('image')) {
-            $data['image_path'] = Storage::disk('s3')->put('images', $request->file('image'));
-        }
-
-        unset($data['image']);
-
-        $post = $this->postService->createPost($data, $request->user()->id);
+        // 画像の保存も含めて、保存の手順は全て PostService に任せる（コントローラーは受け取って渡すだけ）
+        $post = $this->postService->createPost($request->validated(), $request->user()->id);
 
         return redirect()
             ->route('posts.show', $post)

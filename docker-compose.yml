@@ -11,6 +11,13 @@ services:
       - app
     networks:
       - app-network
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"   # 受け取ったメールを確認する画面
+    networks:
+      - app-network
+    # メールを受け取るポート（1025番）は、同じネットワークの app コンテナから使うだけなので ports に書かなくてよい
 
   # PHP-FPM（アプリケーション）
   app:

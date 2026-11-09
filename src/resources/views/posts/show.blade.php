@@ -23,6 +23,13 @@
         <img src="{{ Storage::disk('s3')->url($post->image_path) }}" alt="{{ $post->title }}" style="max-width: 100%;">
     @endif
 
+    @auth
+    <form method="POST" action="{{ route('supports.create', $post) }}">
+        @csrf
+        <button type="submit">この記事の書き手を応援する</button>
+    </form>
+    @endauth
+
     <div class="actions">
         {{-- @can：PostPolicy の判定が true のとき（＝自分の投稿のとき）だけボタンを表示 --}}
         @can('update', $post)
