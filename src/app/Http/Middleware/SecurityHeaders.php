@@ -60,7 +60,7 @@ class SecurityHeaders
             "connect-src 'self'{$viteDev}",
             "object-src 'none'",
             "base-uri 'self'",
-            "form-action 'self'",
+            "fform-action 'self' https://checkout.stripe.com",
             "frame-ancestors 'self'",
         ]);
     }

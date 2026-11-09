@@ -8,6 +8,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\SupportController;
 
 // 基本的なルート（GETリクエストで / にアクセスしたら welcome ビューを返す）
 Route::get('/', function () {
@@ -69,3 +70,9 @@ Route::patch('/reservations/{reservation}/cancel', [ReservationController::class
 
 // ログイン・ユーザー登録・パスワードリセットなど（Breeze が生成）
 require __DIR__.'/auth.php';
+
+
+Route::middleware('auth')->group(function () {
+    Route::post('/posts/{post}/support', [SupportController::class, 'create'])->name('supports.create');
+    Route::get('/supports/success', [SupportController::class, 'success'])->name('supports.success');
+});
