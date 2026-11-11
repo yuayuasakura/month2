@@ -229,3 +229,17 @@ SSH:22 は自分のIPのみ・HTTP:80 は全許可とする。
 
 ### ec2-rds-2
 アウトバウンド・MYSQL/Aurora・3306・rds-ec2-2のグループのみ・EC2からRDSへの通信だけを許可するため。
+
+
+# week13
+## 練習問題1
+### dig　ドメイン名 +short
+・返ってきたもの→Route53に登録したAレコードの値である。
+・何を意味するのか→Elastic IPと同じならドメイン名がEC2に正しく結びついていることを示す。
+
+### curl -I https://ドメイン名
+・ステータスコード→200 OKが返ってきた。
+・Server: nginxはEC2上のnginxが応答していること、Content-Type: text/htmlはHTMLページが返っていること、Content-Security-Policyは設定したCSPが有効になっていることを示している。
+
+### sudo certbot certificates
+'babunoballoon.com'と'www.babunoballoon.com'の両方を対象にした証明書が発行されており、有効期限は2027-02-09である。
