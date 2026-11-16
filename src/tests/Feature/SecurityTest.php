@@ -1,5 +1,7 @@
 <?php
+
 namespace Tests\Feature;
+
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
@@ -8,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
+
 class SecurityTest extends TestCase
 {
     use RefreshDatabase;
@@ -17,7 +20,7 @@ class SecurityTest extends TestCase
         $this->seed(CategorySeeder::class);
         $u = User::factory()->create(['name' => '<img src=x onerror=alert(1)>']);
         $xss = '<script>alert("xss")</script>';
-        $this->actingAs($u)->post('/posts', ['title'=>$xss,'content'=>$xss."\n2行目",'category_id'=>Category::first()->id]);
+        $this->actingAs($u)->post('/posts', ['title' => $xss,'content' => $xss."\n2行目",'category_id' => Category::first()->id]);
         $p = Post::first();
         foreach (["/posts", "/posts/{$p->id}", "/posts/{$p->id}/edit"] as $url) {
             $r = $this->get($url)->assertOk();
@@ -44,19 +47,19 @@ class SecurityTest extends TestCase
         $this->seed(CategorySeeder::class);
         $u = User::factory()->create();
         $sqli = "'; DROP TABLE posts; -- \" OR 1=1";
-        $this->actingAs($u)->post('/posts', ['title'=>$sqli,'content'=>$sqli,'category_id'=>Category::first()->id])->assertRedirect();
+        $this->actingAs($u)->post('/posts', ['title' => $sqli,'content' => $sqli,'category_id' => Category::first()->id])->assertRedirect();
         $this->assertTrue(Schema::hasTable('posts'));
         $this->assertSame($sqli, Post::first()->title);
         $this->get("/posts/1 OR 1=1")->assertNotFound();
         $this->get("/posts/1'")->assertNotFound();
-        $this->actingAs($u)->post('/posts', ['title'=>'a','content'=>'b','category_id'=>"1 OR 1=1"])->assertSessionHasErrors('category_id');
+        $this->actingAs($u)->post('/posts', ['title' => 'a','content' => 'b','category_id' => "1 OR 1=1"])->assertSessionHasErrors('category_id');
         auth()->logout();
-        $this->post('/login', ['email'=>"' OR '1'='1", 'password'=>"' OR '1'='1"])->assertSessionHasErrors('email');
+        $this->post('/login', ['email' => "' OR '1'='1", 'password' => "' OR '1'='1"])->assertSessionHasErrors('email');
     }
 
     public function test_password_security(): void
     {
-        $reg = fn($pw) => $this->post('/register', ['name'=>'a','email'=>uniqid().'@ex.jp','password'=>$pw,'password_confirmation'=>$pw]);
+        $reg = fn ($pw) => $this->post('/register', ['name' => 'a','email' => uniqid().'@ex.jp','password' => $pw,'password_confirmation' => $pw]);
         foreach (['short1A', 'alllowercase1', 'ALLUPPER1', 'NoNumbersHere', '12345678'] as $weak) {
             $reg($weak)->assertSessionHasErrors('password');
             $this->assertGuest();
@@ -70,17 +73,21 @@ class SecurityTest extends TestCase
         $this->assertArrayNotHasKey('remember_token', $user->toArray());
         auth()->logout();
         // ログイン試行回数制限（5回失敗でロック）
-        for ($i = 0; $i < 5; $i++) $this->post('/login', ['email'=>$user->email,'password'=>'Wrong1234']);
-        $this->post('/login', ['email'=>$user->email,'password'=>'Passw0rdOK'])->assertSessionHasErrors('email');
+        for ($i = 0; $i < 5; $i++) {
+            $this->post('/login', ['email' => $user->email,'password' => 'Wrong1234']);
+        }
+        $this->post('/login', ['email' => $user->email,'password' => 'Passw0rdOK'])->assertSessionHasErrors('email');
         $this->assertGuest();
         // 登録の回数制限
-        for ($i = 0; $i < 6; $i++) $reg('weak');
+        for ($i = 0; $i < 6; $i++) {
+            $reg('weak');
+        }
         $reg('Passw0rdOK')->assertStatus(429);
     }
 
     public function test_mass_assignment_guard(): void
     {
         $this->expectException(\Illuminate\Database\Eloquent\MassAssignmentException::class);
-        Post::create(['title'=>'a','content'=>'b','category_id'=>1,'user_id'=>999]);
+        Post::create(['title' => 'a','content' => 'b','category_id' => 1,'user_id' => 999]);
     }
 }

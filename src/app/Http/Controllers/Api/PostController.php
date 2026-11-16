@@ -13,7 +13,8 @@ class PostController extends Controller
     public function __construct(
         private PostService $postService,
         private PostRepository $postRepository
-    ) {}
+    ) {
+    }
 
     // 一覧（新しい順・10件ずつ。投稿者もまとめて取得するので N+1 にならない）
     public function index()

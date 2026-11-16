@@ -1,7 +1,10 @@
 <?php
+
 namespace Tests\Feature;
+
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
+
 class StripeWebhookTest extends TestCase
 {
     private const SECRET = 'whsec_test_secret';
@@ -22,13 +25,15 @@ class StripeWebhookTest extends TestCase
     private function send(string $payload, ?string $signature)
     {
         $headers = ['CONTENT_TYPE' => 'application/json'];
-        if ($signature !== null) $headers['HTTP_STRIPE_SIGNATURE'] = $signature;
+        if ($signature !== null) {
+            $headers['HTTP_STRIPE_SIGNATURE'] = $signature;
+        }
         return $this->call('POST', '/api/webhook/stripe', [], [], [], $headers, $payload);
     }
 
     private function event(string $type): string
     {
-        return json_encode(['id'=>'evt_123','object'=>'event','type'=>$type,'data'=>['object'=>['id'=>'pi_test_123','object'=>'payment_intent','amount'=>500,'currency'=>'jpy']]]);
+        return json_encode(['id' => 'evt_123','object' => 'event','type' => $type,'data' => ['object' => ['id' => 'pi_test_123','object' => 'payment_intent','amount' => 500,'currency' => 'jpy']]]);
     }
 
     public function test_payment_intent_succeeded_is_logged(): void

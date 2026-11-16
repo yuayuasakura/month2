@@ -12,7 +12,8 @@ class TaskService
 {
     public function __construct(
         private TaskRepository $taskRepository
-    ) {}
+    ) {
+    }
 
     public function createTask(array $data, int $userId)
     {

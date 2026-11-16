@@ -1,15 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReservationController;
-use App\Http\Controllers\TaskController;
 use App\Http\Controllers\SupportController;
+use App\Http\Controllers\TaskController;
+use Illuminate\Support\Facades\Route;
 
 // 基本的なルート（GETリクエストで / にアクセスしたら welcome ビューを返す）
 Route::get('/', function () {

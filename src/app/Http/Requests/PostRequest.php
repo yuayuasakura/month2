@@ -20,7 +20,7 @@ class PostRequest extends FormRequest
             'title' => ['required', 'string', 'max:200'],
             'content' => ['required', 'string', 'max:10000'],
             'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'image'=>['nullable','image','max:2048'],
+            'image' => ['nullable','image','max:2048'],
         ];
     }
 

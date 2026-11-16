@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Support;
 use Illuminate\Http\Request;
-use Stripe\Stripe;
+use Illuminate\Support\Facades\Log;
 use Stripe\Checkout\Session;
+use Stripe\Exception\ApiConnectionException;
 use Stripe\Exception\CardException;
 use Stripe\Exception\InvalidRequestException;
-use Stripe\Exception\ApiConnectionException;
-use Illuminate\Support\Facades\Log;
+use Stripe\Stripe;
 
 class SupportController extends Controller
 {
@@ -20,7 +20,7 @@ class SupportController extends Controller
     {
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        try{
+        try {
             $session = Session::create([
                 'line_items' => [[
                     'price_data' => [
@@ -38,21 +38,20 @@ class SupportController extends Controller
             ]);
 
             return redirect($session->url);
-        }
-        catch (CardException $e) {
-    // カードエラー（残高不足・有効期限切れ等）
+        } catch (CardException $e) {
+            // カードエラー（残高不足・有効期限切れ等）
             Log::error('Stripe CardException: ' . $e->getMessage());
             return back()->withErrors(['payment' => 'カードエラーが発生しました: ' . $e->getError()->message]);
 
         } catch (InvalidRequestException $e) {
-    // パラメータ不正
+            // パラメータ不正
             Log::error('Stripe InvalidRequest: ' . $e->getMessage());
             return back()->withErrors(['payment' => '決済リクエストが不正です']);
 
         } catch (ApiConnectionException $e) {
-    // ネットワーク障害（Stripeへの接続失敗）
+            // ネットワーク障害（Stripeへの接続失敗）
             Log::error('Stripe ApiConnection: ' . $e->getMessage());
-                return back()->withErrors(['payment' => '通信エラーが発生しました。時間をおいて再試行してください']);
+            return back()->withErrors(['payment' => '通信エラーが発生しました。時間をおいて再試行してください']);
         }
     }
 

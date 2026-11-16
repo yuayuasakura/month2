@@ -19,7 +19,8 @@ class PostController extends Controller
         private PostService $postService,
         private PostRepository $postRepository,
         private CategoryRepository $categoryRepository
-    ) {}
+    ) {
+    }
 
     // 一覧表示（誰でも見られる）
     public function index()

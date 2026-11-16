@@ -10,7 +10,8 @@ class LikeService
     public function __construct(
         private LikeRepository $likeRepository,
         private PostRepository $postRepository
-    ) {}
+    ) {
+    }
 
     // いいねする（同じ人が何度押しても1件だけ）。戻り値は操作後のいいね数
     public function like(int $postId, int $userId): int

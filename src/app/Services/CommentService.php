@@ -12,7 +12,8 @@ class CommentService
     public function __construct(
         private CommentRepository $commentRepository,
         private PostRepository $postRepository
-    ) {}
+    ) {
+    }
 
     public function createComment(int $postId, array $data, int $userId)
     {

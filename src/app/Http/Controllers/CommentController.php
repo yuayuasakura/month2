@@ -12,7 +12,8 @@ class CommentController extends Controller
     public function __construct(
         private CommentService $commentService,
         private CommentRepository $commentRepository
-    ) {}
+    ) {
+    }
 
     // コメントの保存（ログインユーザーのみ：routes/web.php の auth ミドルウェアで制限）
     // ルートが posts.comments（shallow）なので、URLの {post} が $postId に入る

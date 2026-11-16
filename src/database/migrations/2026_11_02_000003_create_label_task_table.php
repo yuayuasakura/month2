@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     // タスクとラベルの中間テーブル（1つのタスクに複数ラベル、1つのラベルに複数タスク＝多対多）
     // テーブル名は2つのモデル名を単数形・アルファベット順に並べた「label_task」（Laravelの命名規則）
     public function up(): void

@@ -25,7 +25,8 @@ class PostService
         private PostRepository $postRepository,
         private UserRepository $userRepository,
         private CategoryRepository $categoryRepository
-    ) {}
+    ) {
+    }
 
     // API の投稿者・カテゴリー（今週の API は認証なしなので固定）
     private const API_USER_EMAIL = 'test@example.com';

@@ -16,7 +16,8 @@ class TaskController extends Controller
         private TaskService $taskService,
         private TaskRepository $taskRepository,
         private LabelRepository $labelRepository
-    ) {}
+    ) {
+    }
 
     // 一覧：自分のタスクを重要度が高い順に表示
     public function index(Request $request)

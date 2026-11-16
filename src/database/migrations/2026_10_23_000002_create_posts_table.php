@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     // 投稿テーブルを作成する（categories より後に作る必要があるのでファイル名の日時を後にしている）
     public function up(): void
     {

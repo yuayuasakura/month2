@@ -12,7 +12,8 @@ class LikeController extends Controller
 {
     public function __construct(
         private LikeService $likeService
-    ) {}
+    ) {
+    }
 
     // POST /posts/{post}/like
     public function store(Request $request, int $postId): RedirectResponse
