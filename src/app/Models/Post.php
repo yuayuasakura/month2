@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Post extends Model
 {
+    use HasFactory;
     // 一括代入を許可するカラム（$fillable未設定だとcreate()が使えない）
     protected $fillable = [
         'title',
@@ -36,5 +38,17 @@ class Post extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // hasMany: 投稿(1) → いいね(多)
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    // このユーザーがいいね済みか（未ログイン＝null なら false）
+    public function isLikedBy(?User $user): bool
+    {
+        return $user !== null && $this->likes()->where('user_id', $user->id)->exists();
     }
 }

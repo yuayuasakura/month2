@@ -25,6 +25,7 @@
             <small>
                 {{ $post->user->name ?? '投稿者不明' }} ／ {{ $post->created_at->format('Y年m月d日') }}
                 ／ コメント {{ $post->comments_count }}件
+                ／ いいね {{ $post->likes_count }}件
             </small>
         </article>
     @empty

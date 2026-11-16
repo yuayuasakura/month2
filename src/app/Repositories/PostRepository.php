@@ -18,7 +18,7 @@ class PostRepository
         return Post::findOrFail($id);
     }
 
-    // 詳細ページ用に1件取得（投稿者・カテゴリー・コメントもまとめて取得する）
+    // 詳細ページ用に1件取得（投稿者・カテゴリー・コメント・いいね数もまとめて取得する）
     // コメントは古い順に、コメントした人と一緒に取得する
     public function findWithComments(int $id)
     {
@@ -26,7 +26,7 @@ class PostRepository
             'user',
             'category',
             'comments' => fn ($query) => $query->with('user')->oldest(),
-        ])->findOrFail($id);
+        ])->withCount('likes')->findOrFail($id);
     }
 
     // 一覧表示用の投稿を取得（最新順・ページネーション付き）
@@ -35,10 +35,10 @@ class PostRepository
     public function getPublished()
     {
         // with() で投稿者・カテゴリーをまとめて取得（N+1問題を防ぐ）
-        // withCount('comments') で各投稿のコメント数（comments_count）も取得する
+        // withCount で各投稿のコメント数（comments_count）・いいね数（likes_count）もまとめて取得する
         // 同じ秒に作られた投稿の順番がぶれないよう、IDの大きい順を2つ目の並び順にする
         return Post::with(['user', 'category'])
-            ->withCount('comments')
+            ->withCount(['comments', 'likes'])
             ->latest()
             ->latest('id')
             ->paginate(10);

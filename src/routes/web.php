@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\EventController;
@@ -39,6 +40,10 @@ Route::middleware('auth')->group(function () {
         ->only(['store', 'destroy'])
         ->shallow()
         ->middleware('throttle:10,1');
+
+    // いいね・取り消し（同じURLで、POST＝いいね／DELETE＝取り消し）
+    Route::post('/posts/{post}/like', [LikeController::class, 'store'])->name('posts.like');
+    Route::delete('/posts/{post}/like', [LikeController::class, 'destroy'])->name('posts.unlike');
 });
 // 一覧・詳細は誰でも見られる
 Route::resource('posts', PostController::class)->only(['index', 'show']);

@@ -237,9 +237,27 @@ SSH:22 は自分のIPのみ・HTTP:80 は全許可とする。
 ・返ってきたもの→Route53に登録したAレコードの値である。
 ・何を意味するのか→Elastic IPと同じならドメイン名がEC2に正しく結びついていることを示す。
 
+
 ### curl -I https://ドメイン名
 ・ステータスコード→200 OKが返ってきた。
 ・Server: nginxはEC2上のnginxが応答していること、Content-Type: text/htmlはHTMLページが返っていること、Content-Security-Policyは設定したCSPが有効になっていることを示している。
 
+###　curl -I http://babunoballoon.com
+HTTP/1.1 301 Moved Permanently
+
+### curl -I https://www.babunoballoon.com
+HTTP/1.1 301 Moved Permanently
+
 ### sudo certbot certificates
 'babunoballoon.com'と'www.babunoballoon.com'の両方を対象にした証明書が発行されており、有効期限は2027-02-09である。
+
+### sudo systemctl status certbot.timer
+・出力を以下に示す。
+certbot.timer - Run certbot twice daily
+     Loaded: loaded (/usr/lib/systemd/system/certbot.timer; enabled; pr>
+     Active: active (waiting) since Mon 2026-11-16 08:08:16 UTC; 10min >
+ Invocation: 9d2c9f0f072142e7a06db32354ea9599
+    Trigger: Mon 2026-11-16 10:30:01 UTC; 2h 10min left
+   Triggers: ● certbot.service
+
+Nov 16 08:08:16 ip-172-31-19-9 systemd[1]: Started certbot.timer - Run >
