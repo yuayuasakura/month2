@@ -59,6 +59,12 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    // hasMany: ユーザー(1) → いいね(多)
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
     // hasMany: ユーザー(1) → タスク(多)
     public function tasks()
     {

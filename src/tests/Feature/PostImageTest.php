@@ -20,7 +20,7 @@ class PostImageTest extends TestCase
         $cat = Category::first();
 
         // 画面から画像付きで投稿 → S3 に保存され、パスが記録される
-        $this->actingAs($user)->post('/posts', ['title'=>'画像あり','content'=>'x','category_id'=>$cat->id,'image'=>UploadedFile::fake()->image('a.jpg')])->assertRedirect();
+        $this->actingAs($user)->post('/posts', ['title'=>'画像あり','content'=>'x','category_id'=>$cat->id,'image'=>UploadedFile::fake()->image('a.png')])->assertRedirect();
         $post = Post::where('title','画像あり')->first();
         $this->assertStringStartsWith('images/', $post->image_path);
         Storage::disk('s3')->assertExists($post->image_path);
@@ -35,7 +35,7 @@ class PostImageTest extends TestCase
 
         // 更新で画像を差し替えると古い画像は消える
         $old = $post->image_path;
-        $this->put("/posts/{$post->id}", ['title'=>'画像あり','content'=>'y','category_id'=>$cat->id,'image'=>UploadedFile::fake()->image('b.jpg')])->assertRedirect();
+        $this->put("/posts/{$post->id}", ['title'=>'画像あり','content'=>'y','category_id'=>$cat->id,'image'=>UploadedFile::fake()->image('b.png')])->assertRedirect();
         $post->refresh();
         $this->assertNotSame($old, $post->image_path);
         Storage::disk('s3')->assertMissing($old);
@@ -65,7 +65,7 @@ class PostImageTest extends TestCase
             ->shouldReceive('create')->andThrow(new \RuntimeException('DB error'));
 
         try {
-            app(\App\Services\PostService::class)->createPost(['title'=>'a','content'=>'b','image'=>UploadedFile::fake()->image('a.jpg')], 1);
+            app(\App\Services\PostService::class)->createPost(['title'=>'a','content'=>'b','image'=>UploadedFile::fake()->image('a.png')], 1);
             $this->fail('例外が投げられるはず');
         } catch (\RuntimeException $e) {
             $this->assertSame('DB error', $e->getMessage());

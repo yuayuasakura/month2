@@ -23,6 +23,25 @@
         <img src="{{ Storage::disk('s3')->url($post->image_path) }}" alt="{{ $post->title }}" style="max-width: 100%;">
     @endif
 
+    {{-- ===== いいね（件数は誰でも見られる・ボタンはログインユーザーのみ） ===== --}}
+    <div id="like" class="like">
+        いいね {{ $post->likes_count }}件
+        @auth
+            @if ($post->isLikedBy(auth()->user()))
+                <form method="POST" action="{{ route('posts.unlike', $post) }}">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit">いいねを取り消す</button>
+                </form>
+            @else
+                <form method="POST" action="{{ route('posts.like', $post) }}">
+                    @csrf
+                    <button type="submit">いいね</button>
+                </form>
+            @endif
+        @endauth
+    </div>
+
     @auth
     <form method="POST" action="{{ route('supports.create', $post) }}">
         @csrf
