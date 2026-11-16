@@ -11,6 +11,6 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         // テストではViteのビルド成果物（manifest.json）を使わない
-        $this->withoutVite();
+        // $this->withoutVite();
     }
 }
