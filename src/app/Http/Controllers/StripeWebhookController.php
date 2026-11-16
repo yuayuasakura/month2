@@ -41,8 +41,8 @@ class StripeWebhookController extends Controller
             // 決済ID（pi_...）をログに記録する（storage/logs/laravel.log）
             Log::info('決済完了: ' . $paymentIntent->id, [
                 'payment_intent_id' => $paymentIntent->id,
-                'amount'            => $paymentIntent->amount,    // 最小単位（円なら1円単位、ドルならセント）
-                'currency'          => $paymentIntent->currency,
+                'amount'            => $paymentIntent['amount'],   // 最小単位（円なら1円単位、ドルならセント）
+                'currency'          => $paymentIntent['currency'],
                 'event_id'          => $event->id,
             ]);
             // 例: 応援した履歴（supports）の記録や、書き手へのお知らせメールの送信など

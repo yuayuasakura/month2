@@ -4,6 +4,11 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
+
+/**
+ * @mixin \App\Models\Post
+ */
 
 class PostResource extends JsonResource
 {

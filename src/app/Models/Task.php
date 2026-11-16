@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\TaskPriority;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Task extends Model
 {
@@ -24,13 +26,13 @@ class Task extends Model
     ];
 
     // belongsTo: タスク(多) → ユーザー(1)
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     // belongsToMany: タスク(多) ⇔ ラベル(多)（中間テーブル label_task）
-    public function labels()
+    public function labels(): BelongsToMany
     {
         return $this->belongsToMany(Label::class)->withTimestamps();
     }

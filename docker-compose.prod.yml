@@ -1,0 +1,21 @@
+services:
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "127.0.0.1:8000:80"   # ホストのNginx（Week 13、80/443）から転送する。外部には直接公開しない
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: always
+    volumes:
+      - ./src:/var/www/html   # DB_HOST（RDSのエンドポイント）はEC2の src/.env に書く（Week 11）
+
+  # DBは Week 11 で作成した RDS を使うため、db・phpmyadmin サービスは置かない

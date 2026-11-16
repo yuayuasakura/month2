@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Post extends Model
 {
@@ -22,26 +24,30 @@ class Post extends Model
     ];
 
     // belongsTo: 投稿(多) → カテゴリー(1)
-    public function category()
+    /** @return BelongsTo<Category, $this> */
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
     // hasMany: 投稿(1) → コメント(多)
-    public function comments()
+    /** @return HasMany<Comment, $this> */
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
     // belongsTo: 投稿(多) → ユーザー(1)
     // user_id は $fillable に入れない（フォームから偽装されないよう、コントローラーで $request->user()->posts() 経由で設定する）
-    public function user()
+    /** @return BelongsTo<User, $this> */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     // hasMany: 投稿(1) → いいね(多)
-    public function likes()
+    /** @return HasMany<Like, $this> */
+    public function likes(): HasMany
     {
         return $this->hasMany(Like::class);
     }
