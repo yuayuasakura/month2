@@ -11,6 +11,13 @@ services:
       - app
     networks:
       - app-network
+    # アクセスログ・エラーログを Fluentd に送る（設定の意味は app と同じ）
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        fluentd-async: "true"
+        tag: "docker.nginx"
   mailpit:
     image: axllent/mailpit
     ports:
@@ -26,10 +33,38 @@ services:
       dockerfile: docker/php/Dockerfile
     volumes:
       - ./src:/var/www/html   # LaravelのDB接続設定は src/.env に書く（ここには書かない）
+    # Laravel のログを、ファイル（storage/logs）に加えて標準エラー（stderr）にも JSON で出す。
+    # compose の environment は src/.env より優先される
+    environment:
+      LOG_CHANNEL: stack
+      LOG_STACK: "single,stderr"
+      LOG_STDERR_FORMATTER: Monolog\Formatter\JsonFormatter
     depends_on:
       - db
+      - fluentd
     networks:
       - app-network
+    labels:
+      app: "laravel"
+      env: "local"
+    # コンテナのログ（stdout/stderr）を Fluentd に送る
+    logging:
+      driver: "fluentd"
+      options:
+        # ログを送るのはコンテナではなく Docker 本体なので、ホストに公開したポートを指定する
+        fluentd-address: "localhost:24224"
+        # Fluentd が起動していなくても、コンテナの起動を止めない
+        fluentd-async: "true"
+        tag: "docker.app"
+        labels: "app,env"   # 上の labels の値をログに付ける
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
 
   # MySQL（データベース）
   db:
@@ -57,13 +92,23 @@ services:
       - db
     networks:
       - app-network
+  # Fluentd（ログ収集）：各コンテナのログを受け取り、まとめて保存する
+  fluentd:
+    image: fluent/fluentd:v1.19-1
+    ports:
+      - "127.0.0.1:24224:24224"   # Docker 本体がここにログを送る。外部には公開しない
+    volumes:
+      - ./fluentd/conf:/fluentd/etc   # 設定ファイル（fluent.conf）
+      - fluentd-log:/fluentd/log      # 集めたログの保存先
+    networks:
+      - app-network
 
 # 永続化ボリューム（コンテナを削除してもDBのデータを残す）
 volumes:
   db-data:
+  fluentd-log:   # 集めたログ（コンテナを削除しても残す）
 
 # 仮想ネットワーク（同じネットワーク内のコンテナはサービス名で通信できる）
 networks:
   app-network:
     driver: bridge
-

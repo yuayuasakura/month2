@@ -17,5 +17,6 @@ services:
     restart: always
     volumes:
       - ./src:/var/www/html   # DB_HOST（RDSのエンドポイント）はEC2の src/.env に書く（Week 11）
+    image: yuasan/yuasan-my-app:${IMAGE_TAG:-latest}  # 変数で指定。デフォルトはlatest
 
   # DBは Week 11 で作成した RDS を使うため、db・phpmyadmin サービスは置かない

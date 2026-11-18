@@ -1,0 +1,33 @@
+# Git関連
+.git
+.gitignore
+
+# フロントエンド（Week 10）はイメージに含めない
+my-frontend
+
+# 依存関係（**/ を付けると src/ など下の階層にも効く）
+**/node_modules
+**/vendor
+
+# 環境設定（src/.env も除外する）
+**/.env
+**/.env.*
+
+# テスト・開発ツール
+src/tests
+src/.phpunit.cache
+src/storage/logs/*
+# 開発環境で作られた Laravel のキャッシュ（dev 用パッケージの情報が入っていて本番で起動できなくなる）
+src/bootstrap/cache/*.php
+
+# ビルド成果物
+src/public/hot
+src/public/build
+
+# IDE
+.vscode
+.idea
+
+# その他
+README.md
+docker-compose.yml
