@@ -5,6 +5,8 @@
 @section('content')
     <h1>投稿一覧</h1>
 
+    <h1>投稿一覧（v2）</h1>
+
     {{-- @auth：ログインしているときだけ表示 / @guest：ログインしていないときだけ表示 --}}
     @auth
         <a href="{{ route('posts.create') }}">新規投稿</a>
