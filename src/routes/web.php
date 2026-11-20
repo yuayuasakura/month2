@@ -10,6 +10,7 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ImageController;
 
 // 基本的なルート（GETリクエストで / にアクセスしたら welcome ビューを返す）
 Route::get('/', function () {
@@ -81,3 +82,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/posts/{post}/support', [SupportController::class, 'create'])->name('supports.create');
     Route::get('/supports/success', [SupportController::class, 'success'])->name('supports.success');
 });
+
+Route::get('/images/create', [ImageController::class, 'create']);
+Route::post('/images', [ImageController::class, 'store']);

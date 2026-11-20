@@ -20,7 +20,7 @@
     <p>{!! nl2br(e($post->content)) !!}</p>
 
     @if ($post->image_path)
-        <img src="{{ Storage::disk('s3')->url($post->image_path) }}" alt="{{ $post->title }}" style="max-width: 100%;">
+        <img src="{{ Storage::disk('s3')->url($post->image_path) }}" alt="{{ $post->title }}" loading="lazy" width="400" height="300">
     @endif
 
     {{-- ===== いいね（件数は誰でも見られる・ボタンはログインユーザーのみ） ===== --}}

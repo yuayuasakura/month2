@@ -132,7 +132,7 @@ jobs:
   # ステップ4: デプロイ（mainブランチへのpushのみ）
   deploy:
     runs-on: ubuntu-latest
-    needs: test
+    needs: build-and-push
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     env:
       APP_IMAGE: yuasan/yuasan-my-app
