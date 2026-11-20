@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\PostListCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -56,5 +57,12 @@ class Post extends Model
     public function isLikedBy(?User $user): bool
     {
         return $user !== null && $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    // 投稿の作成・更新・削除で、投稿一覧のキャッシュを作り直す
+    protected static function booted(): void
+    {
+        static::saved(fn () => PostListCache::flush());
+        static::deleted(fn () => PostListCache::flush());
     }
 }

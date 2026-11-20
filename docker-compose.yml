@@ -42,6 +42,7 @@ services:
     depends_on:
       - db
       - fluentd
+      - redis
     networks:
       - app-network
     labels:
@@ -102,6 +103,14 @@ services:
       - fluentd-log:/fluentd/log      # 集めたログの保存先
     networks:
       - app-network
+
+  # Redis（キャッシュ）：よく見られる一覧データを一時保存して、DBへの問い合わせを減らす
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"   # 手元から redis-cli で確認する用。外部には公開しない
+    networks:
+      - app-network   # app と同じネットワークに入れる（REDIS_HOST=redis で接続できるようにする）
 
 # 永続化ボリューム（コンテナを削除してもDBのデータを残す）
 volumes:

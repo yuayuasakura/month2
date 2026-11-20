@@ -7,6 +7,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 // 投稿（/posts）の CRUD 全体をテストする
@@ -50,6 +51,26 @@ class PostTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('posts.index');
         $response->assertViewHas('posts', fn ($posts) => $posts->count() === 3);
+    }
+
+    // N+1問題の再発防止：投稿が何件あっても、一覧ページのSQLの本数は変わらない
+    public function test_posts_index_query_count_does_not_grow_with_posts()
+    {
+        $countQueries = function () {
+            DB::flushQueryLog();
+            DB::enableQueryLog();
+            $this->get('/posts')->assertOk();
+            return count(DB::getQueryLog());
+        };
+
+        Post::factory()->count(2)->create();
+        $few = $countQueries();
+
+        // 投稿者・カテゴリーがそれぞれ別の投稿を8件追加（N+1 なら SQL が投稿の数だけ増える）
+        Post::factory()->count(8)->create();
+        $many = $countQueries();
+
+        $this->assertSame($few, $many);
     }
 
     public function test_guest_can_view_posts()

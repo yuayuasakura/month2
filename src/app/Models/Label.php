@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use App\Repositories\LabelRepository;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class Label extends Model
 {
@@ -14,5 +17,13 @@ class Label extends Model
     public function tasks()
     {
         return $this->belongsToMany(Task::class)->withTimestamps();
+    }
+
+    // ラベルが変わったら、選択肢のキャッシュを作り直す
+    protected static function booted(): void
+    {
+        $flush = fn () => DB::afterCommit(fn () => Cache::forget(LabelRepository::CACHE_KEY));
+        static::saved($flush);
+        static::deleted($flush);
     }
 }

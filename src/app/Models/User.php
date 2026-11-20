@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Support\PostListCache;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -70,5 +71,18 @@ class User extends Authenticatable
     public function tasks()
     {
         return $this->hasMany(Task::class);
+    }
+
+    // 投稿一覧には投稿者名を表示しているので、名前の変更・退会でキャッシュを作り直す
+    // （ログインのたびに remember_token が更新されるので、名前が変わったときだけにする）
+    // 退会時は投稿が DB の cascadeOnDelete で消える（Post のイベントは起きない）ので、ここで作り直す
+    protected static function booted(): void
+    {
+        static::updated(function (User $user) {
+            if ($user->wasChanged('name')) {
+                PostListCache::flush();
+            }
+        });
+        static::deleted(fn () => PostListCache::flush());
     }
 }

@@ -3,9 +3,15 @@
 namespace App\Repositories;
 
 use App\Models\Post;
+use App\Support\PostListCache;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 class PostRepository
 {
+    // 一覧の1ページあたりの件数
+    private const PER_PAGE = 10;
+
     // 全件取得（最新順・ページネーション付き）
     public function getAll()
     {
@@ -34,14 +40,29 @@ class PostRepository
     // （status 列を追加したら、ここに ->where('status', 'published') を足すだけで済む）
     public function getPublished()
     {
-        // with() で投稿者・カテゴリーをまとめて取得（N+1問題を防ぐ）
-        // withCount で各投稿のコメント数（comments_count）・いいね数（likes_count）もまとめて取得する
-        // 同じ秒に作られた投稿の順番がぶれないよう、IDの大きい順を2つ目の並び順にする
-        return Post::with(['user', 'category'])
-            ->withCount(['comments', 'likes'])
-            ->latest()
-            ->latest('id')
-            ->paginate(10);
+        $page = Paginator::resolveCurrentPage();
+
+        // ページごとに Redis にキャッシュする（内容が変わったら PostListCache::flush() で作り直す）
+        // ページネーター自体ではなく「その頁の投稿」と「総件数」だけをキャッシュする
+        //   → /posts と /api/posts で同じキャッシュを使っても、ページリンクのURLはそれぞれ正しく作られる
+        ['items' => $items, 'total' => $total] = PostListCache::remember($page, function () use ($page) {
+            // with() で投稿者・カテゴリーをまとめて取得（N+1問題を防ぐ）
+            // withCount で各投稿のコメント数（comments_count）・いいね数（likes_count）もまとめて取得する
+            // 同じ秒に作られた投稿の順番がぶれないよう、IDの大きい順を2つ目の並び順にする
+            $query = Post::with(['user', 'category'])
+                ->withCount(['comments', 'likes'])
+                ->latest()
+                ->latest('id');
+
+            return [
+                'total' => $query->toBase()->getCountForPagination(),
+                'items' => $query->forPage($page, self::PER_PAGE)->get(),
+            ];
+        });
+
+        return new LengthAwarePaginator($items, $total, self::PER_PAGE, $page, [
+            'path' => Paginator::resolveCurrentPath(),
+        ]);
     }
 
     // 特定ユーザーの投稿を取得

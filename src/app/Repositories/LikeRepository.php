@@ -32,9 +32,10 @@ class LikeRepository
     }
 
     // いいねを削除する（いいねしていなければ何もしない）
+    // ※ $query->delete() だとモデルのイベントが起きず、投稿一覧のキャッシュが消えないので、モデルを取得してから消す
     public function remove(Post $post, int $userId): void
     {
-        $post->likes()->where('user_id', $userId)->delete();
+        $post->likes()->where('user_id', $userId)->first()?->delete();
     }
 
     // 投稿のいいね数

@@ -38,6 +38,10 @@ class AppServiceProvider extends ServiceProvider
         // （user_id などを勝手に書き換えようとするバグにすぐ気づける）
         Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
 
+        // 開発中は、with() / load() し忘れたリレーションを一覧で読み込もうとしたらエラーにする（N+1問題にすぐ気づける）
+        // ※ 本番では例外にせず、従来どおり遅延読み込みする（画面が壊れないように）
+        Model::preventLazyLoading(! $this->app->isProduction());
+
         // URLの {post} {comment} {task} は数字だけ受け付ける（"abc" や "1 OR 1=1" は404にする）
         // コントローラーが int $id で受け取るので、数字以外が来ると型エラー(500)になるのを防ぐ
         Route::pattern('post', '[0-9]+');
