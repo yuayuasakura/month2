@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\PostListCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -25,5 +26,12 @@ class Comment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    // コメントの追加・削除で一覧のコメント数が変わるので、投稿一覧のキャッシュを作り直す
+    protected static function booted(): void
+    {
+        static::saved(fn () => PostListCache::flush());
+        static::deleted(fn () => PostListCache::flush());
     }
 }
